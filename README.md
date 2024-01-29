@@ -3,9 +3,9 @@ This streamlines the process of serializing and deserializing data in Python.
 # Motivation
 
 When working with serialization, one often hits the limitation, that only a very limited amount of data types can be actually saved, so one either needs to reduce the spectrum of data types used in the code or create cumbersome, external code to handle the conversion between the types.
-
-![Representation of the workflow of the default and this library's approach to serialization.](https://github.com/fynnbrem/pyserial/blob/master/res/images/banner.png)
-
+<p align="center">
+<img src="https://github.com/fynnbrem/pyserial/blob/main/data/images/banner.png" alt="image" width="auto" height="350">
+</p>
 This library integrates the code of conversion into the serialized classes themselves and offers plenty of implicit conversion to effortlessly serialize some of the more often used data types of Python.
 
 
