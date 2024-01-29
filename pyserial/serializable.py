@@ -4,9 +4,9 @@ The main component of this library next to the corresponding `SerialField` in `s
 from dataclasses import dataclass, fields
 from pathlib import Path
 # noinspection PyUnresolvedReferences
-from typing import Union, Optional, TypeVar, Callable, Any, Iterable
+from typing import Union, Optional, TypeVar, Callable, Any, Iterable, Type
 
-from pyserial.serialization import SerialDict, serialize, serializer_func
+from pyserial.serialization import SerialDict, serialize, serializer_func, SerialTypes
 from pyserial.serial_field import SerialField
 
 
@@ -89,6 +89,17 @@ def run(serializable: Serializable) -> SerialDict:
     return serializable.serialize()
 
 
+def nested_deserializer(iterable_type: Type[Union[list, tuple]], item_deserializer: Callable) -> Callable:
+    """Creates a deserializer that will deserialize
+    an iterable and then also all its items with the `item_deserializer`."""
+
+    def inner(items: list) -> iterable_type:
+        new_items = [item_deserializer(i) for i in items]
+        return iterable_type(new_items)
+
+    return inner
+
+
 if __name__ == '__main__':
     import json
 
@@ -106,11 +117,11 @@ if __name__ == '__main__':
         b: int = SerialField()
         c: list[int] = SerialField(deserializer=list)
         d: tuple[int, ...] = SerialField(deserializer=tuple)
-        e: B = SerialField(default_factory=B)
-        f: Path = SerialField(default=Path("C:/"))
+        e: list[B] = SerialField(deserializer=nested_deserializer(list, B.deserialize))
+        f: B = SerialField(default_factory=B)
 
 
-    a_0 = A("1", 1, [1, 2, 3], (1, 2, 3))
+    a_0 = A("1", 1, [1, 2, 3], (1, 2, 3), [B(1), B(2), B(3)])
     d = a_0.serialize()
     print(a_0)
     d = json.dumps(d, indent="\t")
