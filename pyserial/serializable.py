@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Union, Optional, TypeVar, Callable, Any, Iterable
 
 from pyserial.serialization import SerialDict, serialize, serializer_func
-from serial_field import SerialField
+from pyserial.serial_field import SerialField
 
 
 @dataclass

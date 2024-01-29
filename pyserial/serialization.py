@@ -6,7 +6,7 @@ from typing import Union, Optional, Callable, Any, Iterable
 
 SerialDict = dict[str, Union[str, int, float, list, dict]]
 SerialTypes = [str, int, float, list, SerialDict]
-_SERIALIZERS: list[tuple[type, Union[Callable[[Any], *SerialTypes], None]]] = [
+_SERIALIZERS: list[tuple[type, Optional[Callable[[Any], Union[*SerialTypes]]]]] = [
     (str, None),
     (int, None),
     (float, None),
@@ -16,10 +16,12 @@ Each item is a tuple with the first item being the type this
  serializer corresponds to and the the second being the serializer itself.
 They are ordered in such a way, that subclassses of any class always come before that class.
 
+For `str`, `int` and `float`, the serializer is `None` as these values can be serialized as they are.
+
 To retain that order, only use `add_serializer()`/`@serializer_func()` to add entries to this list."""
 
 
-def add_serializer(type_, serializer):
+def add_serializer(type_: type, serializer: Callable[[Any], Union[*SerialTypes]]):
     """Adds the `serializer` for the `type_` to `SERIALIZERS` while retaining the desired order of that list."""
     for index, (compare_type, _) in enumerate(_SERIALIZERS):
         if compare_type == type_:
@@ -28,7 +30,7 @@ def add_serializer(type_, serializer):
         elif issubclass(type_, compare_type):
             _SERIALIZERS.insert(index, (type_, serializer))
             return
-    _SERIALIZERS.insert(0, (type_, serializer))
+    _SERIALIZERS.append((type_, serializer))
 
 
 def get_serializer(value: Any):
