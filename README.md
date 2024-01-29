@@ -44,6 +44,11 @@ class MyClass(Serializable):
     my_tuple: tuple = SerialField()
 ```
 
-Now you have a simple class, which can be easily serialized with the methods provided my `Serializable`.
+Now you have a simple class, which can be serialized with `MyClass.serialize()` and then be deserialized `MyClass.deserialize()` and be in the same state as you left it in!
 For more details, for example on handling complex type annotations, refer to the documentation of the classes themselves.
+
+# Limitations
+
+Right now, the deserialization paths through the constructor as to guarantee every class is being properly initialized.
+But this also means, that right now it is not intended to force attributes outside of the constructor onto the class. If you still want to serialize non-constructor data, you will need to create a `SerialField` with a default value.
 
