@@ -1,9 +1,26 @@
+"""The `SerialField`-class.
+The main component of this library next to the corresponding `Serializable` in `serializable.py`."""
 from dataclasses import Field, MISSING
 # noinspection PyUnresolvedReferences
 from typing import Union, Optional
 
 
 class SerialField(Field):
+    """A `dataclasses.Field`-subclass that adds extra attributes for serialization:
+    :var serialize=True: Whether to serialize this field.
+        Note, that by default, even fields with `init=False` will be serialized but (yet) cannot be deserialized.
+    :var deserializer=None:
+        A parameter to define an explicit deserializer.
+        This does not always have to be defined, as in the following cases,
+        a proper implicit deserializer can be derived:
+        - The field is annotated with a subclass of `Serializable`. Then the default deserializer of `Serializable`
+            will be used.
+        - The field is annotated with a primitive type that is callable.
+            For example, `tuple` is a primitive type
+            and `tuple()` will be used to cast the serialized data into a tuple.
+            On the other hand, `tuple[int]` is a complex type and cannot be used as caster.
+    """
+
     def __init__(
             self, *, serialize=True, deserializer=None,
             default=MISSING, default_factory=MISSING, init=True, repr=True,
