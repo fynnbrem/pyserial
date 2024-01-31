@@ -7,9 +7,11 @@ from typing import Union, Optional, Callable, Any, Iterable
 SerialDict = dict[str, Union[str, int, float, list, dict]]
 SerialTypes = [str, int, float, list, SerialDict]
 _SERIALIZERS: list[tuple[type, Optional[Callable[[Any], Union[*SerialTypes]]]]] = [
+    (None, None),
     (str, None),
     (int, None),
     (float, None),
+
 ]
 """The list of existing serializers.
 Each item is a tuple with the first item being the type this
@@ -24,6 +26,8 @@ To retain that order, only use `add_serializer()`/`@serializer_func()` to add en
 def add_serializer(type_: type, serializer: Callable[[Any], Union[*SerialTypes]]):
     """Adds the `serializer` for the `type_` to `SERIALIZERS` while retaining the desired order of that list."""
     for index, (compare_type, _) in enumerate(_SERIALIZERS):
+        if compare_type is None:
+            continue
         if compare_type == type_:
             _SERIALIZERS[index] = (type_, serializer)
             return
