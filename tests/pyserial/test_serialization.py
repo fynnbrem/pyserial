@@ -1,6 +1,6 @@
 from itertools import permutations
 # noinspection PyUnresolvedReferences
-from typing import Union, Optional, Any
+from typing import Union, Optional, Any, Type
 
 from pyserial.serialization import add_serializer, _SERIALIZERS, get_serializer, serialize
 
@@ -23,20 +23,20 @@ def test_manage_serializer():
      expects to get the serializer for that exact class and not its superclass,
      independent of the order the classes were added to the serializers.
     """
-    instances = [A(), AB(), ABC()]
-    instances: list[tuple[int, A]] = list(enumerate(instances))
+    classes = [A, AB, ABC]
+    classes: list[tuple[int, Type[A]]] = list(enumerate(classes))
 
     def test(sequence):
         _SERIALIZERS.clear()
         for type_, serializer in sequence:
             add_serializer(type_, serializer)
 
-        for want_index, class_ in instances:
+        for want_index, class_ in classes:
             got_index = get_serializer(class_)()
             assert got_index == want_index, \
                 f"{got_index =}, {want_index =}, sequence = {[str(inst) for inst, idx in sequence]}"
 
-    serializers = [(inst.__class__, lambda i_=idx: i_) for idx, inst in instances]
+    serializers = [(inst, lambda i_=idx: i_) for idx, inst in classes]
     # ↑ The indexes are used as sentinel values to identify the proper serializer
     perms = permutations(serializers)
     for perm in perms:
@@ -48,12 +48,12 @@ def test_get_serializer_superclass():
 
     def test(superclass, subclass):
         _SERIALIZERS.clear()
-        add_serializer(superclass.__class__, lambda: 1)  # 1 As sentinel value for the proper serializer
+        add_serializer(superclass, lambda: 1)  # 1 As sentinel value for the proper serializer
         assert get_serializer(subclass)() == 1, f"{subclass =}, {superclass =}"
 
-    test(A(), AB())
-    test(A(), ABC())
-    test(AB(), ABC())
+    test(A, AB)
+    test(A, ABC)
+    test(AB, ABC)
 
 
 def test_get_serializer_no_exist():
@@ -61,7 +61,7 @@ def test_get_serializer_no_exist():
     _SERIALIZERS.clear()
     try:
         add_serializer(int, lambda: 1)  # Add any non-matching serializer so the sequence is not empty.
-        get_serializer(str())
+        get_serializer(str)
     except ValueError:
         ...
     else:

@@ -37,20 +37,20 @@ def add_serializer(type_: type, serializer: Callable[[Any], Union[*SerialTypes]]
     _SERIALIZERS.append((type_, serializer))
 
 
-def get_serializer(value: Any):
+def get_serializer(type_: type):
     """Gets the serializer for the `value`.
     When there are multiple possible serializers defined due to subclassing,
      the deepest, matching subclass is taken for the deserializer."""
     for key, serializer in _SERIALIZERS:
         # ↑ The promise of returning the deepest, matching subclass is granted by the order of `_SERIALIZERS`.
-        if isinstance(value, key):
+        if issubclass(type_, key):
             return serializer
-    raise ValueError(f"There is no serializer defined for `{type(value)}`")
+    raise ValueError(f"There is no serializer defined for `{type_}`")
 
 
 def serialize(value: Any) -> SerialTypes:
     """Recursively serialize the value. Uses the serializers defined in `_SERIALIZERS`."""
-    serializer = get_serializer(value)
+    serializer = get_serializer(type(value))
     if serializer is None:
         return value
     else:
