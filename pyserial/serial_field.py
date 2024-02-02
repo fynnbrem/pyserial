@@ -9,20 +9,23 @@ class SerialField(Field):
     """A `dataclasses.Field`-subclass that adds extra attributes for serialization:
     :var serialize=True: Whether to serialize this field.
         Note, that by default, even fields with `init=False` will be serialized but (yet) cannot be deserialized.
-    :var deserializer=None:
-        A parameter to define an explicit deserializer.
+    :var caster=None:
+        A parameter to define an explicit type caster.
         This does not always have to be defined, as in the following cases,
-        a proper implicit deserializer can be derived:
+        a proper implicit caster can be derived:
         - The field is annotated with a subclass of `Serializable`. Then the default deserializer of `Serializable`
             will be used.
         - The field is annotated with a primitive type that is callable.
             For example, `tuple` is a primitive type
             and `tuple()` will be used to cast the serialized data into a tuple.
             On the other hand, `tuple[int]` is a complex type and cannot be used as caster.
+        - The field is annotated with a subscripted type that only consists of non-union,
+            nested iterables and a primitive type at the lowest level.
+            For details, see `type_processing.type_to_list()`
     """
 
     def __init__(
-            self, *, serialize=True, deserializer=None,
+            self, *, serialize=True, caster=None,
             default=MISSING, default_factory=MISSING, init=True, repr=True,
             hash=None, compare=True, metadata=None, kw_only=MISSING, **kwargs
     ):
@@ -32,4 +35,5 @@ class SerialField(Field):
             hash=hash, compare=compare, metadata=metadata, kw_only=kw_only, **kwargs
         )
         self.serialize = serialize
-        self.deserializer = deserializer
+        self.caster = caster
+

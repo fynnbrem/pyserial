@@ -23,7 +23,7 @@ def test_manage_serializer():
      expects to get the serializer for that exact class and not its superclass,
      independent of the order the classes were added to the serializers.
     """
-    classes = [A, AB, ABC]
+    classes: list[Type[A]] = [A, AB, ABC]
     classes: list[tuple[int, Type[A]]] = list(enumerate(classes))
 
     def test(sequence):

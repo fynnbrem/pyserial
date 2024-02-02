@@ -6,6 +6,7 @@ from pathlib import Path
 # noinspection PyUnresolvedReferences
 from typing import Union, Optional, TypeVar, Callable, Any, Iterable, Type
 
+from pyserial.deserialization import get_deserializer
 from pyserial.serialization import SerialDict, serialize, serializer_func, SerialTypes
 from pyserial.serial_field import SerialField
 
@@ -52,14 +53,15 @@ class Serializable:
         All fields will be deserialized with their current deserializer.
         The deserializer they had during serialization has no effect on this.
 
-        .. DANGER::
-        This process will *not* force the attributes onto an empty class but will
-        actually call the constructor of the class with the deserialized values as arguments.
-
         Changes in the signature of the class between serializations is handled in the following way:
         - Deserialized fields that are missing in the constructor will be completely skipped.
         - Fields that are in the constructor but not in the deserialized data are required to
          have a default value defined.
+
+        Limitations
+        ===========
+        This process will *not* force the attributes onto an empty class but will
+        actually call the constructor of the class with the deserialized values as arguments.
         """
         deserialized_data = dict()
         for field_ in fields(cls):
@@ -67,19 +69,18 @@ class Serializable:
                 continue
             field_: SerialField
 
-            if field_.deserializer is not None:
-                deserializer = field_.deserializer
-            elif issubclass(field_.type, Serializable):
-                deserializer = field_.type.deserialize
-            elif isinstance(field_.type, type):
-                deserializer = field_.type
+            if field_.caster is not None:
+                caster = field_.caster
             else:
-                raise ValueError(
-                    "Tried to deserialize a field which has no flat type or deserializer defined.\n"
-                    "Define a deserializer for the field when using complex types."
-                )
+                try:
+                    caster = get_deserializer(field_.type)
+                except ValueError:
+                    raise ValueError(
+                        f"There were issues trying to get an implicit deserializer for the field {field_.name}.\n"
+                        "Define an explicit `deserializer` to suit your needs."
+                    )
 
-            deserialized_data[field_.name] = deserializer(data[field_.name])
+            deserialized_data[field_.name] = caster(data[field_.name])
         return cls(**deserialized_data)
 
 
@@ -115,9 +116,9 @@ if __name__ == '__main__':
         """This Class contains various annotations for fields, some requiring an explicit deserializer."""
         a: str = SerialField()
         b: int = SerialField()
-        c: list[int] = SerialField(deserializer=list)
-        d: tuple[int, ...] = SerialField(deserializer=tuple)
-        e: list[B] = SerialField(deserializer=nested_deserializer(list, B.deserialize))
+        c: list[int] = SerialField(caster=list)
+        d: tuple[int, ...] = SerialField(caster=tuple)
+        e: list[B] = SerialField()
         f: B = SerialField(default_factory=B)
 
 
