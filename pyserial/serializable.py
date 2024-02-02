@@ -6,7 +6,7 @@ from pathlib import Path
 # noinspection PyUnresolvedReferences
 from typing import Union, Optional, TypeVar, Callable, Any, Iterable, Type
 
-from pyserial.deserialization import get_deserializer
+from pyserial.casting import get_caster
 from pyserial.serialization import SerialDict, serialize, serializer_func, SerialTypes
 from pyserial.serial_field import SerialField
 
@@ -56,7 +56,10 @@ class Serializable:
         Changes in the signature of the class between serializations is handled in the following way:
         - Deserialized fields that are missing in the constructor will be completely skipped.
         - Fields that are in the constructor but not in the deserialized data are required to
-         have a default value defined.
+            have a default value defined.
+        - Fields that change their `.serialize`-flag to False before deserialization will still be loaded,
+            if the constructor allows it.
+
 
         Limitations
         ===========
@@ -64,8 +67,11 @@ class Serializable:
         actually call the constructor of the class with the deserialized values as arguments.
         """
         deserialized_data = dict()
+        available_fields = [field_.name for field_ in fields(cls) if field_.init]
         for field_ in fields(cls):
             if not isinstance(field_, SerialField):
+                continue
+            if field_.name not in available_fields:
                 continue
             field_: SerialField
 
@@ -73,7 +79,7 @@ class Serializable:
                 caster = field_.caster
             else:
                 try:
-                    caster = get_deserializer(field_.type)
+                    caster = get_caster(field_.type)
                 except ValueError:
                     raise ValueError(
                         f"There were issues trying to get an implicit deserializer for the field {field_.name}.\n"
