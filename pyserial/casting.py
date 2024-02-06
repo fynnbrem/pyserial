@@ -1,33 +1,52 @@
 # noinspection PyUnresolvedReferences
-from typing import Union, Optional, Iterable, Any, Callable, TypeVar
+from typing import Union, Optional, Iterable, Any, Callable, TypeVar, get_origin
 
 from pyserial.type_processing import type_to_list
 
-T = TypeVar("T", bound=type)
+T = TypeVar("T")
 Caster = Callable[[Any], T]
+
+
+def optional_caster(func: Caster[T]) -> Caster[Optional[T]]:
+    """Converts a caster to a caster that will retain `None` as value."""
+
+    def inner(value: Any):
+        if value is None:
+            return None
+        else:
+            return func(value)
+
+    return inner
 
 
 def get_caster(type_: T) -> Caster[T]:
     """Gets a caster for a certain type.
-    - For native types, this is the type itself
+    - For simple types, this is the type itself
     - For Serializable, this is `.deserialize`
-    - For complex types, this is a dedicated caster to cast nested types (See `get_caster_for_complex_type`).
+    - For generic types, this is a dedicated caster to cast nested types (See `get_caster_for_generic_type`).
     """
     from pyserial import Serializable
-    if issubclass(type_, Serializable):
-        caster = type_.deserialize
-    elif isinstance(type_, type):
-        caster = type_
+    # region: Delegate caster acquisition depending on the type.
+    # In the first case, the type is simple and can be used as caster as-is.
+    # In the second case, the type is generic and must be processed into simple types first.
+    if get_origin(type_) is None:  # Simple types have no origin.
+        if issubclass(type_, Serializable):
+            caster = type_.deserialize
+        elif callable(type_):
+            caster = type_
+        else:
+            raise ValueError(f"Cannot get a caster for the simple type `{type_}` as it is not callable.")
     else:
         try:
-            caster = get_caster_for_complex_type(type_)
+            caster = get_caster_for_generic_type(type_)
         except ValueError as err:
             raise ValueError(f"Cannot get deserializer for {type_}.") from err
+    # endregion
     return caster
 
 
-def get_caster_for_complex_type(type_: T) -> Caster[T]:
-    """Creates a caster based on a complex type (a subscripted type).
+def get_caster_for_generic_type(type_: T) -> Caster[T]:
+    """Creates a caster based on a generic type (a parameterized type like `list[str]`).
     The caster will cast iterables nested into each other and their final items into the types defined by the
     `type_`.
 
@@ -57,7 +76,7 @@ def get_caster_for_complex_type(type_: T) -> Caster[T]:
     return caster
 
 
-def get_caster_from_type_list(types: Iterable[Union[type, tuple[Callable, None]]]) -> Caster:
+def get_caster_from_type_list(types: Iterable[Union[type, tuple[type, None]]]) -> Caster:
     """Creates a caster based on a list of types.
     The caster will cast iterables nested into each other and their final items into the types defined by the
     `types`.
@@ -84,6 +103,10 @@ def get_caster_from_type_list(types: Iterable[Union[type, tuple[Callable, None]]
     """
 
     current_type, *types = types
+    optional = False
+    if isinstance(current_type, tuple):
+        current_type, _ = current_type
+        optional = True
 
     def inner(value: Any):
         if issubclass(current_type, Iterable) and not issubclass(current_type, str):
@@ -93,7 +116,10 @@ def get_caster_from_type_list(types: Iterable[Union[type, tuple[Callable, None]]
             casted = get_caster(current_type)(value)
         return casted
 
-    return inner
+    if optional:
+        return optional_caster(inner)
+    else:
+        return inner
 
 
 if __name__ == '__main__':
@@ -102,6 +128,6 @@ if __name__ == '__main__':
         [4, 5, 6],
         [7, 8, 9]
     ]
-    func = get_caster(tuple[list[str]])
-    v = func(d)
+    t_func = get_caster(tuple[list[str]])
+    v = t_func(d)
     print(v)

@@ -42,9 +42,9 @@ def type_to_list(type_: type):
 
 
 def get_type_class(type_: type):
-    """Get the unsubscripted version of a type.
+    """Get the simple origin of a generic type.
     In contrast to `typing.get_origin()`,
-    this returns `type_` if `type_` already is its origin (A non-subscripted type).
+    this returns `type_` if `type_` has no origin (Meaning `type_` is a simple type).
     """
     origin = get_origin(type_)
     if origin is None:

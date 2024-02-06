@@ -2,7 +2,6 @@
 The main component of this library next to the corresponding `SerialField` in `serial_field.py`."""
 
 from dataclasses import dataclass, fields
-from pathlib import Path
 # noinspection PyUnresolvedReferences
 from typing import Union, Optional, TypeVar, Callable, Any, Iterable, Type
 
@@ -125,14 +124,30 @@ if __name__ == '__main__':
         c: list[int] = SerialField(caster=list)
         d: tuple[int, ...] = SerialField(caster=tuple)
         e: list[B] = SerialField()
-        f: B = SerialField(default_factory=B)
+        f: B = SerialField()
+        g: Optional[int] = SerialField()
+        h: Optional[int] = SerialField()
+        i: list[Optional[str]] = SerialField()
 
 
-    a_0 = A("1", 1, [1, 2, 3], (1, 2, 3), [B(1), B(2), B(3)])
+    a_0 = A(
+        "1",
+        1,
+        [1, 2, 3],
+        (1, 2, 3),
+        [B(1), B(2), B(3)],
+        B(),
+        None,
+        1,
+        ["a", None, "c"]
+    )
     d = a_0.serialize()
-    print(a_0)
+    print("Before Serialization:\n", a_0)
+    print("\n")
     d = json.dumps(d, indent="\t")
-    print(d)
+    print("Serialized Data:\n", d)
+    print("\n")
     d = json.loads(d)
     a_1 = A.deserialize(d)
-    print(a_1)
+    print("After Serialization:\n", a_1)
+    print("\n")
