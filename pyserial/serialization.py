@@ -24,7 +24,7 @@ For `str`, `int` and `float`, the serializer is `None` as these values can be se
 To retain that order, only use `add_serializer()`/`@serializer_func()` to add entries to this list."""
 
 
-def add_serializer(type_: type, serializer: Callable[[Any], Union[*SerialTypes]]):
+def add_serializer(type_: type, serializer: Callable[[Any], Union[str, int, float, list, SerialDict]]):
     """Adds the `serializer` for the `type_` to `SERIALIZERS` while retaining the desired order of that list."""
     for index, (compare_type, _) in enumerate(_SERIALIZERS):
         if compare_type is None:
