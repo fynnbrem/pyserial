@@ -1,14 +1,13 @@
 """Functions and data to handle the serialization process itself.
 Also stores the `_SERIALIZERS` used in the process."""
 from pathlib import Path
-from types import NoneType
 # noinspection PyUnresolvedReferences
-from typing import Union, Optional, Callable, Any, Iterable
+from typing import Union, Optional, Callable, Any, Iterable, Dict, List, Tuple
 
-SerialDict = dict[str, Union[str, int, float, list, dict]]
+SerialDict = Dict[str, Union[str, int, float, list, dict]]
 SerialTypes = [str, int, float, list, SerialDict]
-_SERIALIZERS: list[tuple[type, Optional[Callable[[Any], Union[*SerialTypes]]]]] = [
-    (NoneType, None),
+_SERIALIZERS: List[Tuple[type, Optional[Callable[[Any], Union[str, int, float, list, SerialDict]]]]] = [
+    (type(None), None),
     (str, None),
     (int, None),
     (float, None),
@@ -24,7 +23,7 @@ For `str`, `int` and `float`, the serializer is `None` as these values can be se
 To retain that order, only use `add_serializer()`/`@serializer_func()` to add entries to this list."""
 
 
-def add_serializer(type_: type, serializer: Callable[[Any], Union[*SerialTypes]]):
+def add_serializer(type_: type, serializer: Callable[[Any], Union[str, int, float, list, SerialDict]]):
     """Adds the `serializer` for the `type_` to `SERIALIZERS` while retaining the desired order of that list."""
     for index, (compare_type, _) in enumerate(_SERIALIZERS):
         if compare_type is None:
