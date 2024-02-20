@@ -7,7 +7,7 @@ from typing import Union, Optional, Callable, Any, Iterable
 
 SerialDict = dict[str, Union[str, int, float, list, dict]]
 SerialTypes = [str, int, float, list, SerialDict]
-_SERIALIZERS: list[tuple[type, Optional[Callable[[Any], Union[*SerialTypes]]]]] = [
+_SERIALIZERS: list[tuple[type, Optional[Callable[[Any], Union[str, int, float, list, SerialDict]]]]] = [
     (NoneType, None),
     (str, None),
     (int, None),
