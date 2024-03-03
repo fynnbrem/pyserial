@@ -1,5 +1,5 @@
 # noinspection PyUnresolvedReferences
-from typing import Union, Optional, Iterable, Any, Callable, TypeVar, get_origin
+from typing import Union, Optional, Iterable, Any, Callable, TypeVar, get_origin, Tuple
 
 from pyserial.type_processing import type_to_list
 
@@ -76,7 +76,7 @@ def get_caster_for_generic_type(type_: T) -> Caster[T]:
     return caster
 
 
-def get_caster_from_type_list(types: Iterable[Union[type, tuple[type, None]]]) -> Caster:
+def get_caster_from_type_list(types: Iterable[Union[type, Tuple[type, None]]]) -> Caster:
     """Creates a caster based on a list of types.
     The caster will cast iterables nested into each other and their final items into the types defined by the
     `types`.

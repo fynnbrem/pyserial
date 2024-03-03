@@ -1,9 +1,8 @@
 """Helps in handling complex, nested types.
 Primary content is the function `type_to_list()` to convert nested types into a more native format.
 """
-from types import NoneType
 # noinspection PyUnresolvedReferences
-from typing import Union, Optional, get_args, get_origin
+from typing import Union, Optional, get_args, get_origin, Tuple
 
 
 def type_to_list(type_: type):
@@ -27,7 +26,7 @@ def type_to_list(type_: type):
         When there is a non-optional union in the type.
     """
     if is_singular_optional(type_):
-        type_ = next(arg for arg in get_args(type_) if arg is not NoneType)
+        type_ = next(arg for arg in get_args(type_) if arg is not type(None))
         type_tuple = [(get_type_class(type_), None)]
     else:
         type_tuple = [get_type_class(type_)]
@@ -60,7 +59,7 @@ def is_optional(type_: type) -> bool:
     # object, which is a `Union` that contains `None`.
     if get_origin(type_) is not Union:
         return False
-    if NoneType not in get_args(type_):
+    if type(None) not in get_args(type_):
         return False
     return True
 
@@ -77,5 +76,5 @@ def is_singular_optional(type_: type) -> bool:
 
 
 if __name__ == '__main__':
-    t_ = tuple[Union[list[str], None]]
+    t_ = Tuple[Union[Tuple[str], None]]
     print(type_to_list(t_))

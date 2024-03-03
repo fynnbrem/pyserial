@@ -1,14 +1,13 @@
 """Functions and data to handle the serialization process itself.
 Also stores the `_SERIALIZERS` used in the process."""
 from pathlib import Path
-from types import NoneType
 # noinspection PyUnresolvedReferences
-from typing import Union, Optional, Callable, Any, Iterable
+from typing import Union, Optional, Callable, Any, Iterable, Dict, List, Tuple
 
-SerialDict = dict[str, Union[str, int, float, list, dict]]
+SerialDict = Dict[str, Union[str, int, float, list, dict]]
 SerialTypes = [str, int, float, list, SerialDict]
-_SERIALIZERS: list[tuple[type, Optional[Callable[[Any], Union[str, int, float, list, SerialDict]]]]] = [
-    (NoneType, None),
+_SERIALIZERS: List[Tuple[type, Optional[Callable[[Any], Union[str, int, float, list, SerialDict]]]]] = [
+    (type(None), None),
     (str, None),
     (int, None),
     (float, None),

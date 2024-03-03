@@ -3,7 +3,7 @@ The main component of this library next to the corresponding `SerialField` in `s
 
 from dataclasses import dataclass, fields
 # noinspection PyUnresolvedReferences
-from typing import Union, Optional, TypeVar, Callable, Any, Iterable, Type
+from typing import Union, Optional, TypeVar, Callable, Any, Iterable, Type, List, Tuple
 
 from pyserial.casting import get_caster
 from pyserial.serialization import SerialDict, serialize, serializer_func, SerialTypes
@@ -121,13 +121,13 @@ if __name__ == '__main__':
         """This Class contains various annotations for fields, some requiring an explicit deserializer."""
         a: str = SerialField()
         b: int = SerialField()
-        c: list[int] = SerialField(caster=list)
-        d: tuple[int, ...] = SerialField(caster=tuple)
-        e: list[B] = SerialField()
+        c: List[int] = SerialField(caster=list)
+        d: Tuple[int, ...] = SerialField(caster=tuple)
+        e: List[B] = SerialField()
         f: B = SerialField()
         g: Optional[int] = SerialField()
         h: Optional[int] = SerialField()
-        i: list[Optional[str]] = SerialField()
+        i: List[Optional[str]] = SerialField()
 
 
     a_0 = A(

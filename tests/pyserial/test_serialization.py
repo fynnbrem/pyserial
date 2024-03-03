@@ -1,6 +1,6 @@
 from itertools import permutations
 # noinspection PyUnresolvedReferences
-from typing import Union, Optional, Any, Type
+from typing import Union, Optional, Any, Type, List, Tuple
 
 from pyserial.serialization import add_serializer, _SERIALIZERS, get_serializer, serialize
 
@@ -23,8 +23,8 @@ def test_manage_serializer():
      expects to get the serializer for that exact class and not its superclass,
      independent of the order the classes were added to the serializers.
     """
-    classes: list[Type[A]] = [A, AB, ABC]
-    classes: list[tuple[int, Type[A]]] = list(enumerate(classes))
+    classes: List[Type[A]] = [A, AB, ABC]
+    classes: List[Tuple[int, Type[A]]] = list(enumerate(classes))
 
     def test(sequence):
         _SERIALIZERS.clear()

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 # noinspection PyUnresolvedReferences
-from typing import Union, Optional, Any, Iterable
+from typing import Union, Optional, Any, Iterable, Tuple
 from unittest.mock import Mock
 
 from pyserial.casting import optional_caster, get_caster_from_type_list
@@ -18,9 +18,9 @@ def test_optional_caster():
 
 
 def test_get_caster_from_type_list():
-    @dataclass(kw_only=True)
+    @dataclass
     class TestSet():
-        types: Iterable[Union[type, tuple[type, None]]]
+        types: Iterable[Union[type, Tuple[type, None]]]
         input_data: Any
         casted_data: Any
         case: str
