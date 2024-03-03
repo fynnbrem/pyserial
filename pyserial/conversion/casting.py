@@ -26,7 +26,7 @@ def get_caster(type_: T) -> Caster[T]:
     - For simple types, this is the type itself
     - For generic types, this is a dedicated caster to cast nested types (See `get_caster_for_generic_type`).
     """
-    from pyserial import Serializable
+    from pyserial.serializable import Serializable
     # region: Delegate caster acquisition depending on the type.
     # In the first case, the type is simple and can be used as caster as-is.
     # In the second case, the type is generic and must be processed into simple types first.
