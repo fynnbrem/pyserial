@@ -2,12 +2,14 @@
 The main component of this library next to the corresponding `SerialField` in `serial_field.py`."""
 
 from dataclasses import dataclass, fields
+from enum import Enum
 # noinspection PyUnresolvedReferences
 from typing import Union, Optional, TypeVar, Callable, Any, Iterable, Type, List, Tuple
 
-from pyserial.casting import get_caster
-from pyserial.serialization import SerialDict, serialize, serializer_func, SerialTypes
+from pyserial.conversion.casting import get_caster
+
 from pyserial.serial_field import SerialField
+from pyserial.conversion.serialization import SerialDict, serialize, serializer_func
 
 
 @dataclass
@@ -35,7 +37,7 @@ class Serializable:
     """
 
     def serialize(self) -> SerialDict:
-        """Converts this class with alls its fields class
+        """Converts this class with all its fields class
         that are a `SerialField` and have `serialize=True` into a `SerialDict`"""
         data = dict()
         for field_ in fields(self):
@@ -108,7 +110,12 @@ def nested_deserializer(iterable_type: Type[Union[list, tuple]], item_deserializ
 
 if __name__ == '__main__':
     import json
+    from pyserial.conversion.enum_conversion import SerializableEnum
 
+    class E(SerializableEnum):
+        x = 1
+        y = 2
+        z = 3
 
     @dataclass
     class B(Serializable):
@@ -128,6 +135,7 @@ if __name__ == '__main__':
         g: Optional[int] = SerialField()
         h: Optional[int] = SerialField()
         i: List[Optional[str]] = SerialField()
+        j: E = SerialField()
 
 
     a_0 = A(
@@ -139,14 +147,15 @@ if __name__ == '__main__':
         B(),
         None,
         1,
-        ["a", None, "c"]
+        ["a", None, "c"],
+        j=E.x
     )
     d = a_0.serialize()
     print("Before Serialization:\n", a_0)
     print("\n")
     d = json.dumps(d, indent="\t")
-    print("Serialized Data:\n", d)
-    print("\n")
+    # print("Serialized Data:\n", d)
+    # print("\n")
     d = json.loads(d)
     a_1 = A.deserialize(d)
     print("After Serialization:\n", a_1)

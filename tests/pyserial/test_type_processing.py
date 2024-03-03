@@ -1,7 +1,7 @@
 # noinspection PyUnresolvedReferences
 from typing import Union, Optional, List, Tuple
 
-from pyserial.type_processing import is_optional, is_singular_optional, type_to_list
+from pyserial.conversion.type_processing import is_optional, is_singular_optional, type_to_list
 
 
 def test_is_optional():

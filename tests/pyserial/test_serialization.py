@@ -2,7 +2,7 @@ from itertools import permutations
 # noinspection PyUnresolvedReferences
 from typing import Union, Optional, Any, Type, List, Tuple
 
-from pyserial.serialization import add_serializer, _SERIALIZERS, get_serializer, serialize
+from pyserial.conversion.serialization import add_serializer, _SERIALIZERS, get_serializer, serialize
 
 
 class A():

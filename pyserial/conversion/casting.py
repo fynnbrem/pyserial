@@ -1,7 +1,8 @@
 # noinspection PyUnresolvedReferences
 from typing import Union, Optional, Iterable, Any, Callable, TypeVar, get_origin, Tuple
 
-from pyserial.type_processing import type_to_list
+from pyserial.conversion.enum_conversion import SerializableEnum
+from pyserial.conversion.type_processing import type_to_list
 
 T = TypeVar("T")
 Caster = Callable[[Any], T]
@@ -21,8 +22,8 @@ def optional_caster(func: Caster[T]) -> Caster[Optional[T]]:
 
 def get_caster(type_: T) -> Caster[T]:
     """Gets a caster for a certain type.
-    - For simple types, this is the type itself
     - For Serializable, this is `.deserialize`
+    - For simple types, this is the type itself
     - For generic types, this is a dedicated caster to cast nested types (See `get_caster_for_generic_type`).
     """
     from pyserial import Serializable
@@ -30,7 +31,7 @@ def get_caster(type_: T) -> Caster[T]:
     # In the first case, the type is simple and can be used as caster as-is.
     # In the second case, the type is generic and must be processed into simple types first.
     if get_origin(type_) is None:  # Simple types have no origin.
-        if issubclass(type_, Serializable):
+        if issubclass(type_, (Serializable, SerializableEnum)):
             caster = type_.deserialize
         elif callable(type_):
             caster = type_

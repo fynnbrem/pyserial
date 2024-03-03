@@ -1,5 +1,6 @@
 """Functions and data to handle the serialization process itself.
 Also stores the `_SERIALIZERS` used in the process."""
+from enum import Enum
 from pathlib import Path
 # noinspection PyUnresolvedReferences
 from typing import Union, Optional, Callable, Any, Iterable, Dict, List, Tuple
@@ -70,7 +71,7 @@ def serializer_func(*types: type):
 
 @serializer_func(list, tuple)
 def run(iterable: Iterable) -> list:
-    """Lists and tuples must both be cast into a `list` and their items must be serialized."""
+    """Lists and tuples will both be cast into a `list` and their items will be serialized."""
     new = list()
     for item in iterable:
         new.append(serialize(item))
@@ -81,3 +82,10 @@ def run(iterable: Iterable) -> list:
 def run(path: Path) -> str:
     """Paths must be cast into `str`."""
     return str(path)
+
+
+@serializer_func(Enum)
+def run(enum: Enum) -> Union[str, int]:
+    """Enums will be cast into their value."""
+    return enum.value
+

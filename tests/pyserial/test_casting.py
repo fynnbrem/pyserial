@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import Union, Optional, Any, Iterable, Tuple
 from unittest.mock import Mock
 
-from pyserial.casting import optional_caster, get_caster_from_type_list
+from pyserial.conversion.casting import optional_caster, get_caster_from_type_list
 
 
 def test_optional_caster():
