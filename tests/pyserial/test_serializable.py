@@ -1,3 +1,4 @@
+import datetime
 from dataclasses import dataclass
 # noinspection PyUnresolvedReferences
 from typing import Union, Optional, List, Tuple
@@ -32,6 +33,7 @@ if __name__ == '__main__':
         h: Optional[int] = SerialField()
         i: List[Optional[str]] = SerialField()
         j: E = SerialField()
+        k: datetime.datetime = SerialField()
 
     a_0 = A(
         "1",
@@ -43,7 +45,8 @@ if __name__ == '__main__':
         None,
         1,
         ["a", None, "c"],
-        j=E.x
+        j=E.x,
+        k=datetime.datetime.now()
     )
     d = a_0.serialize()
     print("Before Serialization:\n", a_0)
