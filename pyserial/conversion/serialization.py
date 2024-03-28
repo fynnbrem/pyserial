@@ -1,5 +1,6 @@
 """Functions and data to handle the serialization process itself.
 Also stores the `_SERIALIZERS` used in the process."""
+import datetime
 from enum import Enum
 from pathlib import Path
 # noinspection PyUnresolvedReferences
@@ -76,6 +77,12 @@ def run(iterable: Iterable) -> list:
     for item in iterable:
         new.append(serialize(item))
     return new
+
+@serializer_func(datetime.datetime)
+def run(date: datetime.datetime) -> str:
+    """Lists and tuples will both be cast into a `list` and their items will be serialized."""
+    return date.isoformat()
+
 
 
 @serializer_func(Path)
