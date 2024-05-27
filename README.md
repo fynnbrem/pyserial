@@ -1,3 +1,13 @@
+# Disclaimer
+
+This project is abandoned because I found out `pydantic` can do the same stuff but better.
+
+Now it just remains here as memorabilia.
+
+<br><br><br>
+__Original description:__
+
+
 This streamlines the process of serializing and deserializing data in Python.
 
 # Motivation
